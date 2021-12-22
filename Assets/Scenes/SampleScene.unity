@@ -222,6 +222,8 @@ MonoBehaviour:
   distance: 1
   startXPos: -1.5
   startYPos: 1.5
+  dimensionXCount: 4
+  dimensionYCount: 4
   cellList: []
 --- !u!1 &519420028
 GameObject:
