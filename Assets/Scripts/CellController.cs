@@ -14,6 +14,9 @@ public class CellController : MonoBehaviour
 
     [SerializeField] private bool isEmpty = true;
 
+    public int DimensionX { get { return dimentionX; } }
+    public int DimensionY { get { return dimentionY; } }
+
     public void SetDimention(int x,int y)
     {
         dimentionX = x;
@@ -41,19 +44,17 @@ public class CellController : MonoBehaviour
     {
         isEmpty = value;
 
+        BoardController.GetInstance().AddEmptyList(this, value);
+
         if (value)
         {
-            Debug.Log("Test");
             currentValue = 0;
             textValue.text = string.Empty;
         }
-         
     }
 
     public void LevelUp()
     {
-        
-
         currentValue *= 2;
         textValue.text = currentValue.ToString();
     }

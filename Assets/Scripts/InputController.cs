@@ -33,25 +33,22 @@ public class InputController : MonoBehaviour
             {
                 if ((touchStartPos.y + 100f) < touch.position.y && isTouching)
                 {
-                    Debug.Log("Yukarý Kaydýrýldý");
                     BoardController.GetInstance().MoveToDirection(Direction.UP);
+                    CommandManager.GetInstance().AddMove(BoardController.GetInstance().MoveToDirection(Direction.UP));
                     isTouching = false;
                 }
                 else if ((touchStartPos.y - 100f) > touch.position.y && isTouching)
                 {
-                    Debug.Log("Aþaðýya Kaydýrýldý");
                     BoardController.GetInstance().MoveToDirection(Direction.DOWN);
                     isTouching = false;
                 }
                 else if ((touchStartPos.x - 100f) > touch.position.x && isTouching)
                 {
-                    Debug.Log("Sola Kaydýrýldý");
                     BoardController.GetInstance().MoveToDirection(Direction.LEFT);
                     isTouching = false;
                 }
                 else if ((touchStartPos.x + 100f) < touch.position.x && isTouching)
                 {
-                    Debug.Log("Saða Kaydýrýldý");
                     BoardController.GetInstance().MoveToDirection(Direction.RIGHT);
                     isTouching = false;
                 }
