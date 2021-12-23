@@ -34,7 +34,7 @@ public class InputController : MonoBehaviour
                 if ((touchStartPos.y + 100f) < touch.position.y && isTouching)
                 {
                     BoardController.GetInstance().MoveToDirection(Direction.UP);
-                    CommandManager.GetInstance().AddMove(BoardController.GetInstance().MoveToDirection(Direction.UP));
+                    //CommandManager.GetInstance().AddMove(BoardController.GetInstance().MoveToDirection(Direction.UP));
                     isTouching = false;
                 }
                 else if ((touchStartPos.y - 100f) > touch.position.y && isTouching)
