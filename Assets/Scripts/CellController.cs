@@ -27,7 +27,9 @@ public class CellController : MonoBehaviour
     public void SetValue(int value)
     {
         currentValue = value;
+
         textValue.text = value.ToString();
+
     }
 
     public int GetValue()

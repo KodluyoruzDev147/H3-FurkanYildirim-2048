@@ -20,7 +20,7 @@ public class InputController : MonoBehaviour
 
     private void TouchControl()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && !CommandManager.GetInstance().IsReplay)
         {
             Touch touch = Input.GetTouch(0);
 
@@ -33,26 +33,34 @@ public class InputController : MonoBehaviour
             {
                 if ((touchStartPos.y + 100f) < touch.position.y && isTouching)
                 {
+                    if (!CommandManager.GetInstance().IsReplay)
+                        CommandManager.GetInstance().AddMove(new Move(MoveType.Swipe, Direction.UP));
+
                     BoardController.GetInstance().MoveToDirection(Direction.UP);
-                    CommandManager.GetInstance().AddMove(Direction.UP);
                     isTouching = false;
                 }
                 else if ((touchStartPos.y - 100f) > touch.position.y && isTouching)
                 {
+                    if (!CommandManager.GetInstance().IsReplay)
+                        CommandManager.GetInstance().AddMove(new Move(MoveType.Swipe, Direction.DOWN));
+
                     BoardController.GetInstance().MoveToDirection(Direction.DOWN);
-                    CommandManager.GetInstance().AddMove(Direction.DOWN);
                     isTouching = false;
                 }
                 else if ((touchStartPos.x - 100f) > touch.position.x && isTouching)
                 {
+                    if (!CommandManager.GetInstance().IsReplay)
+                        CommandManager.GetInstance().AddMove(new Move(MoveType.Swipe, Direction.LEFT));
+
                     BoardController.GetInstance().MoveToDirection(Direction.LEFT);
-                    CommandManager.GetInstance().AddMove(Direction.LEFT);
                     isTouching = false;
                 }
                 else if ((touchStartPos.x + 100f) < touch.position.x && isTouching)
                 {
+                    if (!CommandManager.GetInstance().IsReplay)
+                        CommandManager.GetInstance().AddMove(new Move(MoveType.Swipe, Direction.RIGHT));
+
                     BoardController.GetInstance().MoveToDirection(Direction.RIGHT);
-                    CommandManager.GetInstance().AddMove(Direction.RIGHT);
                     isTouching = false;
                 }
             }

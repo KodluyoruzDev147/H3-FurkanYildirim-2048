@@ -6,9 +6,6 @@ using UnityEngine;
 public class CommandManager : MonoBehaviour
 {
 
-    public List<Direction> moveList = new List<Direction>();
-    public List<CellController> spawnedCells = new List<CellController>();
-
     #region Singleton
 
     private static CommandManager instance;
@@ -29,34 +26,79 @@ public class CommandManager : MonoBehaviour
     #endregion
 
 
-    public void AddMove(Direction move)
+    public List<Move> moveList = new List<Move>();
+
+    private Coroutine myCoroutine;
+
+    private bool isReplay;
+
+    public bool IsReplay { get; set; }
+
+    public void AddMove(Move move)
     {
         moveList.Add(move);
     }
 
-    public void AddSpawnedCell(CellController cell)
-    {
-        spawnedCells.Add(cell);
-    }
-
     public void Replay()
     {
-        StartCoroutine(ReplayIEnumerator());
+        if (myCoroutine!=null)
+            StopCoroutine(myCoroutine);
+
+        IsReplay = true;
+        myCoroutine = StartCoroutine(ReplayIEnumerator());
+
     }
 
     private IEnumerator ReplayIEnumerator()
     {
         for (int i = 0; i < moveList.Count; i++)
         {
-            if (i == 0)
-                BoardController.GetInstance().SpawnRandomValues(2);
-            else
-                BoardController.GetInstance().SpawnRandomValues(1);
+            if (moveList[i].moveType == MoveType.Swipe)
+            {
+                BoardController.GetInstance().MoveToDirection(moveList[i].direction);
+            }
+            else if (moveList[i].moveType == MoveType.Spawn)
+            {
+                BoardController.GetInstance().SpawnRandomValues(moveList[i].cell);
+            }
 
-            BoardController.GetInstance().MoveToDirection(moveList[i]);
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.3f);
         }
+
+        IsReplay = false;
     }
 
-    
+
+    public void Reset()
+    {
+        IsReplay = false;
+        if (myCoroutine!=null)
+            StopCoroutine(myCoroutine);
+
+        moveList.Clear();
+
+    }
+
+
+}
+[System.Serializable]
+public class Move
+{
+    public MoveType moveType;
+    public Direction direction;
+    public CellController cell;
+
+    public Move(MoveType moveType, Direction direction = Direction.DOWN , CellController cell = null)
+    {
+        this.moveType = moveType;
+        this.direction = direction;
+        this.cell = cell;
+
+    }
+}
+
+public enum MoveType
+{
+    Swipe = 0,
+    Spawn = 1
 }

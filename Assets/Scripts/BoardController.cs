@@ -42,7 +42,6 @@ public class BoardController : MonoBehaviour
     private void Start()
     {
         CreateBoard();
-        SpawnRandomValues(2);
     }
 
     private void CreateBoard()
@@ -66,34 +65,37 @@ public class BoardController : MonoBehaviour
             currentXPos = startXPos;
             currentYPos -= distance;
         }
+
+        SpawnRandomValues(emptyCellList[Random.Range(0, emptyCellList.Count)]);
     }
 
     
-    public void ResetGame()
+    public void Replay()
     {
+        emptyCellList.Clear();
+
+        for (int i = 0; i < cellList.Count; i++)
+        {
+            cellList[i].SetValue(0);
+            cellList[i].SetEmpty(true);
+        }
+
+        CommandManager.GetInstance().Replay();
+    }
+
+    public void Restart()
+    {
+        CommandManager.GetInstance().Reset();
+
         for (int i = 0; i < cellList.Count; i++)
         {
             Destroy(cellList[i].gameObject);
         }
-        cellList.Clear();
-        cellDic.Clear();
-        emptyCellList.Clear();
-    }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            ResetGame();
-        }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            CreateBoard();
-        }
-        else if (Input.GetKeyDown(KeyCode.T))
-        {
-            CommandManager.GetInstance().Replay();
-        }
+        cellDic.Clear();
+        cellList.Clear();
+        emptyCellList.Clear();
+        CreateBoard();
     }
 
 
@@ -103,23 +105,25 @@ public class BoardController : MonoBehaviour
     }
 
 
-    public void SpawnRandomValues(int count)
+    public void SpawnRandomValues(CellController cell)
     {
-        for (int i = 0; i < count; i++)
+        if (cell != null)
         {
-            if (emptyCellList.Count <= 0)
-                break;
+            if (!CommandManager.GetInstance().IsReplay)
+                CommandManager.GetInstance().AddMove(new Move(MoveType.Spawn, cell: cell));
 
-            CellController cell = emptyCellList[Random.Range(0, emptyCellList.Count)];
             cell.SetValue(2);
             cell.SetEmpty(false);
             emptyCellList.Remove(cell);
+
         }
+            
 
         if (emptyCellList.Count == 0)
             GameOverControl();
     }
-    public void SpawnValues(List<CellController> cells)
+
+    public void SpawnCommandValues(List<CellController> cells)
     {
         for (int i = 0; i < cells.Count; i++)
         {
@@ -180,9 +184,7 @@ public class BoardController : MonoBehaviour
         }
 
         if (!gameEnd)
-        {
             Debug.Log("Game Over");
-        }
 
     }
     private bool IsEqualCellValues(CellController cell1,CellController cell2)
@@ -205,188 +207,211 @@ public class BoardController : MonoBehaviour
         {
             case Direction.UP:
 
-                for (int i = 1; i < dimensionXCount; i++)
-                {
-                    for (int j = 0; j < dimensionYCount; j++)
-                    {
-                        CellController cell = cellDic[new Vector2(i, j)];
-
-                        if (cell.IsEmpty())
-                            continue;
-
-                        for (int k = 1; k < dimensionXCount; k++)
-                        {
-
-                            if (i-k < 0)
-                                break;
-                            else
-                            {
-                                CellController cell2 = cellDic[new Vector2(i - k, j)];
-
-                                if (cell2.IsEmpty())
-                                {
-                                    cell2.SetValue(cell.GetValue());
-                                    cell2.SetEmpty(false);
-                                    cell.SetEmpty(true);
-                                    cell = cell2;
-                                }
-                                else
-                                {
-                                    if (cell.GetValue() == cell2.GetValue())
-                                    {
-                                        cell2.LevelUp();
-                                        cell.SetEmpty(true);
-                                    }
-                                    else
-                                        break;
-
-                                }
-                            }
-                        
-                        }
-                    }
-                }
+                UpSideControl();
 
                 break;
             case Direction.DOWN:
 
-                for (int i = dimensionXCount-2; i >= 0; i--)
-                {
-                    for (int j = 0; j < dimensionYCount; j++)
-                    {
-                        CellController cell = cellDic[new Vector2(i, j)];
-
-                        if (cell.IsEmpty())
-                            continue;
-
-                        for (int k = 1; k < dimensionXCount; k++)
-                        {
-                            if (i + k > dimensionXCount-1)
-                                break;
-                            else
-                            {
-                                CellController cell2 = cellDic[new Vector2(i + k, j)];
-
-                                if (cell2.IsEmpty())
-                                {
-                                    cell2.SetValue(cell.GetValue());
-                                    cell2.SetEmpty(false);
-                                    cell.SetEmpty(true);
-                                    cell = cell2;
-                                }
-                                else
-                                {
-                                    if (cell.GetValue() == cell2.GetValue())
-                                    {
-                                        cell2.LevelUp();
-                                        cell.SetEmpty(true);
-                                    }
-                                    else
-                                        break;
-
-                                }
-                            }
-
-                        }
-                    }
-                }
+                DownSideControl();
 
                 break;
             case Direction.RIGHT:
 
-                for (int i = dimensionYCount-2; i >= 0; i--)
-                {
-                    for (int j = 0; j < dimensionYCount; j++)
-                    {
-                        CellController cell = cellDic[new Vector2(j, i)];
-
-                        if (cell.IsEmpty())
-                            continue;
-
-                        for (int k = 1; k < dimensionXCount; k++)
-                        {
-                            if (i + k > dimensionYCount-1)
-                                break;
-                            else
-                            {
-                                CellController cell2 = cellDic[new Vector2(j, i + k)];
-
-                                if (cell2.IsEmpty())
-                                {
-                                    cell2.SetValue(cell.GetValue());
-                                    cell2.SetEmpty(false);
-                                    cell.SetEmpty(true);
-                                    cell = cell2;
-                                }
-                                else
-                                {
-                                    if (cell.GetValue() == cell2.GetValue())
-                                    {
-                                        cell2.LevelUp();
-                                        cell.SetEmpty(true);
-                                    }
-                                    else
-                                        break;
-
-                                }
-                            }
-
-                        }
-                    }
-                }
+                RightSideControl();
 
                 break;
             case Direction.LEFT:
 
-                for (int i = 1; i < dimensionYCount; i++)
-                {
-                    for (int j = 0; j < dimensionYCount; j++)
-                    {
-                        CellController cell = cellDic[new Vector2(j, i)];
-
-                        if (cell.IsEmpty())
-                            continue;
-
-                        for (int k = 1; k < dimensionXCount; k++)
-                        {
-                            if (i - k < 0)
-                                break;
-                            else
-                            {
-                                CellController cell2 = cellDic[new Vector2(j, i - k)];
-
-                                if (cell2.IsEmpty())
-                                {
-                                    cell2.SetValue(cell.GetValue());
-                                    cell2.SetEmpty(false);
-                                    cell.SetEmpty(true);
-                                    cell = cell2;
-                                }
-                                else
-                                {
-                                    if (cell.GetValue() == cell2.GetValue())
-                                    {
-                                        cell2.LevelUp();
-                                        cell.SetEmpty(true);
-                                    }
-                                    else
-                                        break;
-
-                                }
-                            }
-
-                        }
-                    }
-                }
+                LeftSideControl();
 
                 break;
             default:
                 break;
         }
 
-        SpawnRandomValues(1);
+        if (emptyCellList.Count > 0 && !CommandManager.GetInstance().IsReplay)
+            SpawnRandomValues(emptyCellList[Random.Range(0, emptyCellList.Count)]);
+
 
     }
+
+    private void LeftSideControl()
+    {
+        for (int i = 1; i < dimensionYCount; i++)
+        {
+            for (int j = 0; j < dimensionYCount; j++)
+            {
+                CellController cell = cellDic[new Vector2(j, i)];
+
+                if (cell.IsEmpty())
+                    continue;
+
+                for (int k = 1; k < dimensionXCount; k++)
+                {
+                    if (i - k < 0)
+                        break;
+                    else
+                    {
+                        CellController cell2 = cellDic[new Vector2(j, i - k)];
+
+                        if (cell2.IsEmpty())
+                        {
+                            cell2.SetValue(cell.GetValue());
+                            cell2.SetEmpty(false);
+                            cell.SetEmpty(true);
+                            cell = cell2;
+                        }
+                        else
+                        {
+                            if (cell.GetValue() == cell2.GetValue())
+                            {
+                                cell2.LevelUp();
+                                cell.SetEmpty(true);
+                            }
+                            else
+                                break;
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void RightSideControl()
+    {
+        for (int i = dimensionYCount - 2; i >= 0; i--)
+        {
+            for (int j = 0; j < dimensionYCount; j++)
+            {
+                CellController cell = cellDic[new Vector2(j, i)];
+
+                if (cell.IsEmpty())
+                    continue;
+
+                for (int k = 1; k < dimensionXCount; k++)
+                {
+                    if (i + k > dimensionYCount - 1)
+                        break;
+                    else
+                    {
+                        CellController cell2 = cellDic[new Vector2(j, i + k)];
+
+                        if (cell2.IsEmpty())
+                        {
+                            cell2.SetValue(cell.GetValue());
+                            cell2.SetEmpty(false);
+                            cell.SetEmpty(true);
+                            cell = cell2;
+                        }
+                        else
+                        {
+                            if (cell.GetValue() == cell2.GetValue())
+                            {
+                                cell2.LevelUp();
+                                cell.SetEmpty(true);
+                            }
+                            else
+                                break;
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void DownSideControl()
+    {
+        for (int i = dimensionXCount - 2; i >= 0; i--)
+        {
+            for (int j = 0; j < dimensionYCount; j++)
+            {
+                CellController cell = cellDic[new Vector2(i, j)];
+
+                if (cell.IsEmpty())
+                    continue;
+
+                for (int k = 1; k < dimensionXCount; k++)
+                {
+                    if (i + k > dimensionXCount - 1)
+                        break;
+                    else
+                    {
+                        CellController cell2 = cellDic[new Vector2(i + k, j)];
+
+                        if (cell2.IsEmpty())
+                        {
+                            cell2.SetValue(cell.GetValue());
+                            cell2.SetEmpty(false);
+                            cell.SetEmpty(true);
+                            cell = cell2;
+                        }
+                        else
+                        {
+                            if (cell.GetValue() == cell2.GetValue())
+                            {
+                                cell2.LevelUp();
+                                cell.SetEmpty(true);
+                            }
+                            else
+                                break;
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void UpSideControl()
+    {
+        for (int i = 1; i < dimensionXCount; i++)
+        {
+            for (int j = 0; j < dimensionYCount; j++)
+            {
+                CellController cell = cellDic[new Vector2(i, j)];
+
+                if (cell.IsEmpty())
+                    continue;
+
+                for (int k = 1; k < dimensionXCount; k++)
+                {
+
+                    if (i - k < 0)
+                        break;
+                    else
+                    {
+                        CellController cell2 = cellDic[new Vector2(i - k, j)];
+
+                        if (cell2.IsEmpty())
+                        {
+                            cell2.SetValue(cell.GetValue());
+                            cell2.SetEmpty(false);
+                            cell.SetEmpty(true);
+                            cell = cell2;
+                        }
+                        else
+                        {
+                            if (cell.GetValue() == cell2.GetValue())
+                            {
+                                cell2.LevelUp();
+                                cell.SetEmpty(true);
+                            }
+                            else
+                                break;
+
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
 
 }
 
