@@ -37,6 +37,8 @@ public class BoardController : MonoBehaviour
 
     [SerializeField] private List<CellController> emptyCellList = new List<CellController>();
 
+    [SerializeField] private List<CellController> cellList = new List<CellController>();
+
     private void Start()
     {
         CreateBoard();
@@ -56,6 +58,7 @@ public class BoardController : MonoBehaviour
 
                 cellDic.Add(new Vector2(i, j), cell);
                 AddEmptyList(cell,true);
+                cellList.Add(cell);
 
                 cell.SetDimention(i, j);
                 currentXPos += distance;
@@ -65,12 +68,42 @@ public class BoardController : MonoBehaviour
         }
     }
 
+    
+    public void ResetGame()
+    {
+        for (int i = 0; i < cellList.Count; i++)
+        {
+            Destroy(cellList[i].gameObject);
+        }
+        cellList.Clear();
+        cellDic.Clear();
+        emptyCellList.Clear();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            ResetGame();
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            CreateBoard();
+        }
+        else if (Input.GetKeyDown(KeyCode.T))
+        {
+            CommandManager.GetInstance().Replay();
+        }
+    }
+
+
     public CellController GetCellController(Vector2 dimension)
     {
         return cellDic[dimension];
     }
 
-    private void SpawnRandomValues(int count)
+
+    public void SpawnRandomValues(int count)
     {
         for (int i = 0; i < count; i++)
         {
@@ -86,6 +119,17 @@ public class BoardController : MonoBehaviour
         if (emptyCellList.Count == 0)
             GameOverControl();
     }
+    public void SpawnValues(List<CellController> cells)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            cells[i].SetValue(2);
+            cells[i].SetEmpty(false);
+            emptyCellList.Remove(cells[i]);
+        }
+    }
+
+    
 
     private void GameOverControl()
     {

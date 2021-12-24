@@ -5,10 +5,9 @@ using UnityEngine;
 
 public class CommandManager : MonoBehaviour
 {
-    public delegate void Moves();
-    public Moves moves;
 
-    public List<Moves> moveList = new List<Moves>();
+    public List<Direction> moveList = new List<Direction>();
+    public List<CellController> spawnedCells = new List<CellController>();
 
     #region Singleton
 
@@ -30,10 +29,34 @@ public class CommandManager : MonoBehaviour
     #endregion
 
 
-    public void AddMove(Moves move)
+    public void AddMove(Direction move)
     {
         moveList.Add(move);
     }
 
+    public void AddSpawnedCell(CellController cell)
+    {
+        spawnedCells.Add(cell);
+    }
 
+    public void Replay()
+    {
+        StartCoroutine(ReplayIEnumerator());
+    }
+
+    private IEnumerator ReplayIEnumerator()
+    {
+        for (int i = 0; i < moveList.Count; i++)
+        {
+            if (i == 0)
+                BoardController.GetInstance().SpawnRandomValues(2);
+            else
+                BoardController.GetInstance().SpawnRandomValues(1);
+
+            BoardController.GetInstance().MoveToDirection(moveList[i]);
+            yield return new WaitForSeconds(0.8f);
+        }
+    }
+
+    
 }
