@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +8,10 @@ public class BoardController : MonoBehaviour
     #region Singleton
 
     private static BoardController instance;
-
+    /* ZTK was here
+     * Singleton sadece static instance demek değildir.
+     * Singleton olabilmesi için başka bir obje oluşumunu tamamen engellemelidir.
+     */
     private void Awake()
     {
         if (instance != null)

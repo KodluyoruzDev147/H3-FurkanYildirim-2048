@@ -1,11 +1,14 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CommandManager : MonoBehaviour
 {
-
+    /* ZTK was here
+     * Command pattern ın güzel bir örneği olmuş
+     * Eline sağlık
+     */
     #region Singleton
 
     private static CommandManager instance;
