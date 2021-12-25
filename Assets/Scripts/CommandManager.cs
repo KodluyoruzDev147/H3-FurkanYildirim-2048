@@ -16,7 +16,14 @@ public class CommandManager : MonoBehaviour
     private void Awake()
     {
         if (instance != null)
+        {
+            if (instance != this)
+                Destroy(this);
+
             return;
+        }
+
+
 
         instance = this;
     }

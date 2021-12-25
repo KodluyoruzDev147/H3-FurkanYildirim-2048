@@ -8,15 +8,26 @@ public class BoardController : MonoBehaviour
     #region Singleton
 
     private static BoardController instance;
+
     /* ZTK was here
      * Singleton sadece static instance demek değildir.
      * Singleton olabilmesi için başka bir obje oluşumunu tamamen engellemelidir.
      */
+
+    /* Furkan was here
+     * Teşekkür ederim kopyayı destroy etmeyi unutmuşum.
+     */
+
     private void Awake()
     {
         if (instance != null)
-            return;
+        {
+            if (instance != this)
+                Destroy(this);
 
+            return;
+        }
+  
         instance = this;
     }
 
